@@ -19,6 +19,7 @@ our @CARP_NOT = qw(
   Games::Lacuna::Client::Alliance
   Games::Lacuna::Client::Body
   Games::Lacuna::Client::Buildings
+  Games::Lacuna::Client::Captcha
   Games::Lacuna::Client::Empire
   Games::Lacuna::Client::Inbox
   Games::Lacuna::Client::Map
@@ -69,8 +70,13 @@ sub call {
     ),
     uri => URI->new($uri),
   );
-  my $resp = $self->ua->request($req);
-  my $res = $self->marshal->response_to_result($resp);
+  my $resp           = $self->ua->request($req);
+  my $client_warning = $resp->header('Client-Warning');
+  if ( defined $client_warning && $client_warning eq 'Internal response') {
+    die "RPC Connection Error: " . $resp->message;
+  }
+  my $res = eval { $self->marshal->response_to_result($resp) }
+    or die "RPC Error : " . $resp->content;
 
   if ($self->{client}->{verbose_rpc}) {
     my @tmp = @$params;
