@@ -1,18 +1,18 @@
-package Games::Lacuna::Client::Buildings::Parliament;
+package Games::Lacuna::Client::Buildings::SSLA;
 use 5.0080000;
 use strict;
 use warnings;
 use Carp 'croak';
 
 use Games::Lacuna::Client;
-use Games::Lacuna::Client::Buildings::Modules;
+use Games::Lacuna::Client::Buildings;
 
-our @ISA = qw(Games::Lacuna::Client::Buildings::Modules);
+our @ISA = qw(Games::Lacuna::Client::Buildings);
 
 sub api_methods {
   return {
-    view_propositions => { default_args => [qw(session_id building_id)] },
-    cast_vote         => { default_args => [qw(session_id building_id)] },
+    make_plan      => { default_args => [qw(session_id building_id)] },
+    subsidize_plan => { default_args => [qw(session_id building_id)] },
   };
 }
 
@@ -23,7 +23,7 @@ __END__
 
 =head1 NAME
 
-Games::Lacuna::Client::Buildings::Parliament - Parliament
+Games::Lacuna::Client::Buildings::SSLA - SpaceStation Lab A
 
 =head1 SYNOPSIS
 

@@ -14,6 +14,12 @@ AlgaePond:
     - food
     - glyph
   type: glyph
+AmalgusMeadow:
+  produces: food
+  tags:
+    - food
+    - glyph
+  type: glyph
 Apple:
   produces: food
   requires:
@@ -186,6 +192,12 @@ Denton:
   tags:
     - food
   type: food
+DentonBrambles:
+  produces: food
+  tags:
+    - food
+    - glyph
+  type: glyph
 DeployedBleeder:
   produces: waste
   tags:
@@ -422,6 +434,13 @@ MassadsHenge:
   tags:
     - glyph
   type: glyph
+MercenariesGuild:
+  tags:
+    - command
+    - infrastructure
+    - ship
+    - trade
+  type: command
 MetalJunkArches:
   produces: happiness
   tags:
@@ -586,6 +605,26 @@ SAW:
   tags:
     - command
     - defense
+    - infrastructure
+  type: command
+SSLA:
+  tags:
+    - command
+    - infrastructure
+  type: command
+SSLB:
+  tags:
+    - command
+    - infrastructure
+  type: command
+SSLC:
+  tags:
+    - command
+    - infrastructure
+  type: command
+SSLD:
+  tags:
+    - command
     - infrastructure
   type: command
 Sand:

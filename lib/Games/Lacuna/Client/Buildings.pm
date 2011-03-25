@@ -24,6 +24,7 @@ our @BuildingTypes = (qw(
     IBS
     Intelligence
     LibraryOfJith
+    MercenariesGuild
     MiningMinistry
     MissionCommand
     Network19
@@ -36,6 +37,7 @@ our @BuildingTypes = (qw(
     Security
     Shipyard
     SpacePort
+    SSLA
     StationCommand
     SubspaceSupplyDepot
     TempleOfTheDrajilites
