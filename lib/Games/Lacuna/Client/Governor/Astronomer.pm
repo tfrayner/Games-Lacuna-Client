@@ -46,24 +46,16 @@ use Data::Dumper;
         };
 
         ### Now find Spaceports.
-        my (@spaceports) = $gov->find_buildings('SpacePort');
+        my ($spaceport) = $gov->find_buildings('SpacePort');
         my @all_probes;
         my @ships;
         my @traveling;
         my @probe_to_port;
-        for my $sp ( @spaceports ){
-            my $page = 0;
-            while( $page <= 4 ){
-                $page++;
-                my $data = $sp->view_all_ships($page);
-                push @all_probes, grep { $_->{type} eq 'probe' } @{$data->{ships}};
-                push @ships, grep { $_->{task} eq 'Docked' and $_->{type} eq 'probe' } @{$data->{ships}};
-                push @probe_to_port, map {; $_->{id} => $sp } @ships;
-                push @traveling, grep { $_->{task} eq 'Travelling' and $_->{type} eq 'probe' } @{$data->{ships}};
-                last if $page * $SHIPS_PER_PAGE >= $data->{number_of_ships};
-            }
-        }
-
+        my $data = $spaceport->view_all_ships({no_paging => 1});
+        push @all_probes, grep { $_->{type} eq 'probe' } @{$data->{ships}};
+        push @ships, grep { $_->{task} eq 'Docked' and $_->{type} eq 'probe' } @{$data->{ships}};
+        push @probe_to_port, map {; $_->{id} => $spaceport } @ships;
+        push @traveling, grep { $_->{task} eq 'Travelling' and $_->{type} eq 'probe' } @{$data->{ships}};
         # Build more probes if directed
         my (@shipyards) = $gov->find_buildings('Shipyard');
         my $build_probes = $config->{build_probes} || 0;
@@ -82,7 +74,7 @@ use Data::Dumper;
         }
 
         $gov->{_observatory_plugin}{ports}{$pid} = {
-            ports => \@spaceports,
+            ports => [ $spaceport ],
             docked => \@ships,
             travel => \@traveling,
             probe2port => { @probe_to_port },

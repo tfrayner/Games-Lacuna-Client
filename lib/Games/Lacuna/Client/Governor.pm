@@ -73,6 +73,8 @@ sub run {
             $self->{current}->{config}    = $colony_config;
             push @priorities, @{$colony_config->{priorities} || [] };
             $self->govern();
+
+            sleep 20;
         }
 
         ### Do post_$priority actions.

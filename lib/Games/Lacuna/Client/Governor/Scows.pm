@@ -37,13 +37,8 @@ use Data::Dumper;
         my ($sp) = $gov->find_buildings('SpacePort');
         my @ships;
         my @probe_to_port;
-        my $page = 0;
-        while( $page <= 4 ){
-            $page++;
-            my $data = $sp->view_all_ships($page);
-            push @ships, grep { $_->{task} eq 'Docked' and $_->{type} eq 'scow' } @{$data->{ships}};
-            last if $page * $SHIPS_PER_PAGE >= $data->{number_of_ships};
-        }
+        my $data = $sp->view_all_ships({no_paging => 1});
+        push @ships, grep { $_->{task} eq 'Docked' and $_->{type} eq 'scow' } @{$data->{ships}};
 
         my $target = {
             star_id   => $status->{star_id},
