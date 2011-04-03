@@ -19,9 +19,6 @@ use Data::Dumper;
     use Date::Parse qw(str2time);
     use List::MoreUtils qw(minmax uniq any);
     use Games::Lacuna::Client::PrettyPrint qw(trace message warning action ptime phours);
-    my $PROBES_PER_PAGE = 25;
-    my $SHIPS_PER_PAGE = 25;
-    my $PROBES_PER_LVL = 3;
 
     sub run {
         my $class   = shift;
@@ -38,7 +35,9 @@ use Data::Dumper;
         my @ships;
         my @probe_to_port;
         my $data = $sp->view_all_ships({no_paging => 1});
-        push @ships, grep { $_->{task} eq 'Docked' and $_->{type} eq 'scow' } @{$data->{ships}};
+        push @ships, grep { $_->{task} eq 'Docked'
+                        and $_->{type} eq 'scow'
+                        and $_->{hold_size} <= $status->{waste_stored} } @{$data->{ships}};
 
         my $target = {
             star_id   => $status->{star_id},
