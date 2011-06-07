@@ -20,6 +20,7 @@ sub api_methods {
         view_sent
         read_message
         archive_messages
+        trash_messages
         send_message
       )
     ),
