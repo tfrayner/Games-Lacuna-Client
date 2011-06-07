@@ -1,4 +1,4 @@
-package Games::Lacuna::Client::Buildings::StationCommand;
+package Games::Lacuna::Client::Buildings::TheftTraining;
 use 5.0080000;
 use strict;
 use warnings;
@@ -11,7 +11,9 @@ our @ISA = qw(Games::Lacuna::Client::Buildings);
 
 sub api_methods {
   return {
-    view_plans => { default_args => [qw(session_id building_id)] },
+    view                  => { default_args => [qw(session_id building_id)] },
+    train_spy             => { default_args => [qw(session_id building_id)] },
+    view_spies            => { default_args => [qw(session_id building_id)] },
   };
 }
 
@@ -22,7 +24,7 @@ __END__
 
 =head1 NAME
 
-Games::Lacuna::Client::Buildings::PlanetaryCommand - The Planetary Command building
+Games::Lacuna::Client::Buildings::TheftTraining - The Theft Training Facility building
 
 =head1 SYNOPSIS
 
@@ -32,11 +34,11 @@ Games::Lacuna::Client::Buildings::PlanetaryCommand - The Planetary Command build
 
 =head1 AUTHOR
 
-Carl Franks, E<lt>cfranks@cpan.orgE<gt>
+Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by Carl Franks
+Copyright (C) 2010 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

@@ -57,7 +57,7 @@ my $client = Games::Lacuna::Client->new(
 my $empire  = $client->empire->get_status->{empire};
 
 # reverse hash, to key by name instead of id
-my %planets = map { $empire->{planets}{$_}, $_ } keys %{ $empire->{planets} };
+my %planets = reverse %{ $empire->{planets} };
 
 SS:
 for my $name ( sort keys %planets ) {
@@ -78,6 +78,8 @@ for my $name ( sort keys %planets ) {
     my $parliament_id = first {
             $buildings->{$_}->{url} eq '/parliament'
         } keys %$buildings;
+    
+    next if !defined $parliament_id;
     
     my $parliament = $client->building( id => $parliament_id, type => 'Parliament' );
     
