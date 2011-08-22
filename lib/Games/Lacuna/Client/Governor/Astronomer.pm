@@ -46,16 +46,19 @@ use Data::Dumper;
         };
 
         ### Now find Spaceports.
-        my ($spaceport) = $gov->find_buildings('SpacePort');
+        my (@spaceports) = $gov->find_buildings('SpacePort');
         my @all_probes;
         my @ships;
         my @traveling;
         my @probe_to_port;
-        my $data = $spaceport->view_all_ships({no_paging => 1});
-        push @all_probes, grep { $_->{type} eq 'probe' } @{$data->{ships}};
-        push @ships, grep { $_->{task} eq 'Docked' and $_->{type} eq 'probe' } @{$data->{ships}};
-        push @probe_to_port, map {; $_->{id} => $spaceport } @ships;
-        push @traveling, grep { $_->{task} eq 'Travelling' and $_->{type} eq 'probe' } @{$data->{ships}};
+        for my $sp ( @spaceports ){
+                my $data = $sp->view_all_ships({ "no_paging" => 1 });
+                push @all_probes, grep { $_->{type} eq 'probe' } @{$data->{ships}};
+                push @ships, grep { $_->{task} eq 'Docked' and $_->{type} eq 'probe' } @{$data->{ships}};
+                push @probe_to_port, map {; $_->{id} => $sp } @ships;
+                push @traveling, grep { $_->{task} eq 'Travelling' and $_->{type} eq 'probe' } @{$data->{ships}};
+        }
+
         # Build more probes if directed
         my (@shipyards) = $gov->find_buildings('Shipyard');
         my $build_probes = $config->{build_probes} || 0;
