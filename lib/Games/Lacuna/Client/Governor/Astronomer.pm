@@ -77,7 +77,7 @@ use Data::Dumper;
         }
 
         $gov->{_observatory_plugin}{ports}{$pid} = {
-            ports => [ $spaceport ],
+            ports => \@spaceports,
             docked => \@ships,
             travel => \@traveling,
             probe2port => { @probe_to_port },
