@@ -126,9 +126,15 @@ while (1) {
     my $err;
     my $action;
     if ($build_order->{ship_type}) {
-      output("Building new ship");
+      output("Building new ships");
+      my $count = $build_order->{ship_count};
+      $count = 1 unless defined $count;
       $action = 'ship';
-      eval { $build_order->{building}->build_ship($build_order->{ship_type}) };
+      eval {
+	  for ( 1..$count ) {
+	      $build_order->{building}->build_ship($build_order->{ship_type})
+	  }
+      };
       $err = $@;
     }
     elsif ($build_order->{upgrade}) {
