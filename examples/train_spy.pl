@@ -8,6 +8,8 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Games::Lacuna::Client ();
 
+use POSIX;
+
 my $planet_name;
 my $assignment;
 
@@ -57,7 +59,8 @@ my $empire  = $client->empire->get_status->{empire};
 # reverse hash, to key by name instead of id
 my %planets = reverse %{ $empire->{planets} };
 
-my $body      = $client->body( id => $planets{$planet_name} );
+my $body_id   = $planets{$planet_name};
+my $body      = $client->body( id => $body_id );
 my $buildings = $body->get_buildings->{buildings};
 
 my $intel_id = first {
@@ -77,22 +80,30 @@ unless ( $building_id ) {
 
 my $building = $client->building( id => $building_id, type => $trainhash{ $assignment } );
 
-SPY:
-for my $spy ( @{ $intel->view_spies->{spies} } ) {
+my $spy_num   = $intel->view->{spies}{current};
+my $num_pages = ceil($spy_num/25);
 
-    next SPY unless $spy->{assignment} eq 'Idle';
+PAGE:
+for my $page ( 1..$num_pages ) {
 
-    my $return;
-    eval {
-        $return = $building->train_spy( $spy->{ id } );
-    };
+    SPY:
+    for my $spy ( @{ $intel->view_spies($page)->{spies} } ) {
 
-    if ($@) {
-        warn "Error: $@\n";
-        next;
+	next SPY unless ( $spy->{assignment} eq 'Idle'
+                       && $spy->{assigned_to}{body_id} eq $body_id );
+
+	my $return;
+	eval {
+	    $return = $building->train_spy( $spy->{ id } );
+	};
+
+	if ($@) {
+	    warn "Error: $@\n";
+	    next;
+	}
+	
+	print( $return->{trained} ? "Spy trained\n" : "Spy not trained\n" );
     }
-
-    print( $return->{trained} ? "Spy trained\n" : "Spy not trained\n" );
 }
 
 exit;
