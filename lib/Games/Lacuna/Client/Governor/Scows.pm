@@ -27,7 +27,7 @@ use Data::Dumper;
 
         my $ssa = $config->{profile}->{waste}->{send_scows_above};
         return if (not defined $ssa or
-            $status->{waste_capacity} == 0 or 
+            $status->{waste_capacity} == 0 or
             ($status->{waste_stored}/$status->{waste_capacity}) < $ssa);
 
         ### Find Spaceports.
@@ -36,14 +36,14 @@ use Data::Dumper;
         my @probe_to_port;
         my $data = $sp->view_all_ships({no_paging => 1});
         push @ships, grep { $_->{task} eq 'Docked'
-                        and $_->{type} eq 'scow'
+                        and $_->{type} =~ m/^scow/
                         and $_->{hold_size} <= $status->{waste_stored} } @{$data->{ships}};
 
         my $target = {
             star_id   => $status->{star_id},
         };
 
-        while(@ships && 
+        while(@ships &&
             ($status->{waste_stored}/$status->{waste_capacity}) >= $ssa) {
             my $ship = pop @ships;
             $sp->send_ship($ship->{id},$target);
@@ -74,7 +74,7 @@ This module examines each colony and the scows currently available.
 
 This module looks for the profile->waste->send_scows_above configuration key in the governor config
 for each colony.  This number is a decimal between 0 and 1, representing a proportion.
-If the proportion of waste to capacity is over this amount, scows are sent to the 
+If the proportion of waste to capacity is over this amount, scows are sent to the
 nearest star.
 
 =head1 SEE ALSO

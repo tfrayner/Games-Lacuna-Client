@@ -59,7 +59,8 @@ my $empire  = $client->empire->get_status->{empire};
 # reverse hash, to key by name instead of id
 my %planets = reverse %{ $empire->{planets} };
 
-my $body      = $client->body( id => $planets{$planet_name} );
+my $body_id   = $planets{$planet_name};
+my $body      = $client->body( id => $body_id );
 my $buildings = $body->get_buildings->{buildings};
 
 my $intel_id = first {
@@ -88,7 +89,8 @@ for my $page ( 1..$num_pages ) {
     SPY:
     for my $spy ( @{ $intel->view_spies($page)->{spies} } ) {
 
-	next SPY unless $spy->{assignment} eq 'Idle';
+	next SPY unless ( $spy->{assignment} eq 'Idle'
+                       && $spy->{assigned_to}{body_id} eq $body_id );
 
 	my $return;
 	eval {
