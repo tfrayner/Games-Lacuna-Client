@@ -36,7 +36,7 @@ use Data::Dumper;
         my @probe_to_port;
         my $data = $sp->view_all_ships({no_paging => 1});
         push @ships, grep { $_->{task} eq 'Docked'
-                        and $_->{type} eq 'scow'
+                        and $_->{type} =~ m/^scow/
                         and $_->{hold_size} <= $status->{waste_stored} } @{$data->{ships}};
 
         my $target = {

@@ -74,7 +74,8 @@ sub run {
             push @priorities, @{$colony_config->{priorities} || [] };
             $self->govern();
 
-            sleep 20;
+	    # Try to avoid the RPC-per-minute limit.
+            sleep 60;
         }
 
         ### Do post_$priority actions.
