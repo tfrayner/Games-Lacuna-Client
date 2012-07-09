@@ -21,8 +21,8 @@ require Time::Duration if $use_seconds_left;
 my $cfg_file = Games::Lacuna::Client->get_config_file([shift(@ARGV) || 'lacuna.yml']);
 
 my $client = Games::Lacuna::Client->new(
-	cfg_file => $cfg_file,
-	# debug    => 1,
+    cfg_file => $cfg_file,
+    # debug    => 1,
 );
 
 # Load the planets
