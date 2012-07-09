@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use List::Util            (qw(first));
+use List::Util            (qw(first sum min));
 use Games::Lacuna::Client ();
 use Getopt::Long          (qw(GetOptions));
 use POSIX                 (qw(floor));
@@ -74,23 +74,45 @@ my $trade_min_id = first {
 
 my $trade_min = $client->building( id => $trade_min_id, type => 'Trade' );
 
-my $glyphs_result = $trade_min->get_glyphs;
-my @glyphs        = @{ $glyphs_result->{glyphs} };
+my $glyphs_result = $trade_min->get_glyph_summary;
+my @glyph_types   = @{ $glyphs_result->{glyphs} };
 
 if ( $match_glyph ) {
-    @glyphs =
+    @glyph_types =
         grep {
             $_->{type} =~ /$match_glyph/i
-        } @glyphs;
+        } @glyph_types;
 }
 
-if ( !@glyphs ) {
+if ( !@glyph_types ) {
     print "No glyphs available to push\n";
     exit;
 }
 
-if ( $max && @glyphs > $max ) {
-    splice @glyphs, $max;
+
+sub limit_glyphs {
+
+    my ( $glyph_types, $count ) = @_;
+
+    my $running = 0;
+    foreach my $n ( 0..scalar(@$glyph_types) ) {
+	my $num = $glyph_types->[$n]->{quantity};
+	my $diff = $num + $running - $count;
+	if ( $diff > 0 ) {
+	    $glyph_types->[$n]->{quantity} = $num - $diff;
+	    $glyph_types = [ @{ $glyph_types[0..$n] } ];
+	    last;
+	}
+	else {
+	    $running += $num;
+	}
+    }
+
+    return $glyph_types;
+  }
+
+if ( $max ) {
+    @glyph_types = @{ limit_glyphs( \@glyph_types, $max ) };
 }
 
 my $ship_id;
@@ -108,12 +130,12 @@ if ( $ship_name ) {
 
     if ( $ship ) {
         my $cargo_each = $glyphs_result->{cargo_space_used_each};
-        my $cargo_req  = $cargo_each * scalar @glyphs;
+        my $cargo_req  = $cargo_each * sum map { $_->{quantity} } @glyph_types;
 
         if ( $ship->{hold_size} < $cargo_req ) {
             my $count = floor( $ship->{hold_size} / $cargo_each );
 
-            splice @glyphs, $count;
+	    @glyph_types = @{ limit_glyphs( \@glyph_types, $count ) };
 
             warn sprintf "Specified ship cannot hold all plans - only pushing %d plans\n", $count;
         }
@@ -126,13 +148,7 @@ if ( $ship_name ) {
     }
 }
 
-my @items =
-    map {
-        +{
-            type     => 'glyph',
-            glyph_id => $_->{id},
-        }
-    } @glyphs;
+my @items = map { $_->{type} = 'glyph'; $_ } @glyph_types;
 
 my $return = $trade_min->push_items(
     $to_id,
@@ -141,7 +157,7 @@ my $return = $trade_min->push_items(
              : ()
 );
 
-printf "Pushed %d glyphs\n", scalar @glyphs;
+printf "Pushed %d glyphs\n", sum map { $_->{quantity} } @glyph_types;
 printf "Arriving %s\n", $return->{ship}{date_arrives};
 
 exit;
@@ -153,7 +169,7 @@ Usage: $0 CONFIG_FILE
        --to        PLANET_NAME    (REQUIRED)
        --ship      SHIP NAME REGEX
        --glyph     GLYPH NAME REGEX
-       --max       MAX No. GLYPHS TO PUSH
+       --max       MAX No. GLYPHS TO PUSH (currently inactivated)
 
 CONFIG_FILE  defaults to 'lacuna.yml'
 

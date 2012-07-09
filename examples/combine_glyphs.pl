@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use List::Util            (qw(first));
+use List::Util            (qw(first max));
 use Games::Lacuna::Client ();
 use Getopt::Long          (qw(GetOptions));
 
@@ -65,18 +65,24 @@ die "Planet does not have an Archaeology Ministry\n"
     if !$arch_id;
 
 my $arch_min         = $client->building( id => $arch_id, type => 'Archaeology' );
-my $candidate_glyphs = $arch_min->get_glyphs->{glyphs};
+my $candidate_glyphs = $arch_min->get_glyph_summary->{glyphs};
 my @use_glyphs;
+my $num_used = max map { $_->{quantity} } @$candidate_glyphs;
 
 WANT:
 for my $want_glyph ( @glyphs ) {
     for my $candidate ( @$candidate_glyphs ) {
-        next if grep { $candidate->{id} == $_->{id} }
-            @use_glyphs;
+#        next if grep { $candidate->{id} == $_->{id} }
+#            @use_glyphs;
 
         next if $candidate->{type} ne lc $want_glyph;
 
-        push @use_glyphs, $candidate;
+        push @use_glyphs, $candidate->{type};
+
+	if ( $candidate->{quantity} < $num_used ) {
+	    $num_used = $candidate->{quantity}
+	}
+
         next WANT;
     }
 
@@ -84,10 +90,10 @@ for my $want_glyph ( @glyphs ) {
 }
 
 my $return = $arch_min->assemble_glyphs(
-    [ map { $_->{id} } @use_glyphs ]
+    \@use_glyphs, $num_used
 );
 
-printf "Successfully created a '%s'\n", $return->{item_name};
+printf "Successfully created %d '%s'\n", $num_used, $return->{item_name};
 exit;
 
 

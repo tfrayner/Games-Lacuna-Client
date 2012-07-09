@@ -103,6 +103,8 @@ for my $page ( 1..$num_pages ) {
 	}
 	
 	print( $return->{trained} ? "Spy trained\n" : "Spy not trained\n" );
+
+	sleep 5;
     }
 }
 
